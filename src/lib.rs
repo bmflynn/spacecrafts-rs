@@ -88,31 +88,36 @@ impl DB {
         let project = "spacecraftsdb";
         let filename = format!("{project}.json");
 
-        let mut not_found = anyhow::Error::new(IoError::new(
-            ErrorKind::NotFound,
-            "Unable to locate spacecraftsdb at any of the following locations:",
-        ));
-
+        // cwd
         let mut paths = vec![PathBuf::from_str(&filename)?];
+
+        // XDG_DATA_HOME
         if let Ok(s) = env::var("XDG_DATA_HOME") {
             let path = PathBuf::new().join(s).join(project).join(&filename);
             paths.push(path);
         }
+
+        // HOME
         if let Some(homedir) = dirs::home_dir() {
             paths.push(homedir.join(format!(".{filename}")));
         }
 
+        let mut tried = vec![];
         for path in &paths {
-            not_found = not_found.context("{path}");
             if path.exists() && path.is_file() {
                 return Ok(path.to_str().unwrap().to_string());
             }
+            tried.push(format!("{path:?}"));
         }
 
-        Err(not_found)
+        Err(anyhow::Error::new(IoError::new(
+            ErrorKind::NotFound,
+            "Unable to locate spacecraftsdb at any of the following locations: ".to_string()
+                + &tried.join(", "),
+        )))
     }
 
-    /// Creates a new ``DB`` by searching for the spacecrafts db file in `./spacecraftsdb.json`, 
+    /// Creates a new ``DB`` by searching for the spacecrafts db file in `./spacecraftsdb.json`,
     /// `$XDG_DATA_HOME/spacecraftsdb/spacecraftsdb.json`, then `$HOME/.spacecraftsdb.json`.
     ///
     /// # Errors
