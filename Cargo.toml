@@ -1,0 +1,18 @@
+[package]
+name = "spacecrafts-rs"
+version = "0.1.0"
+authors = ["Bruce Flynn <brucef@ssec.wisc.edu>"]
+edition = "2021"
+description = "Spacecraft metadata"
+keywords = ["spacepacket", "framing", "cadu"]
+categories = ["aerospace::space-protocols"]
+license-file = "LICENSE.txt"
+repository = "https://github.com/bmflynn/spacecrafts-rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.81"
+dirs = "5.0.1"
+serde = { version = "1.0.197", features = ["derive"] }
+serde_json = "1.0.115"
