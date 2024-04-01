@@ -147,8 +147,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "spacecrafts-rs"
-version = "0.1.0"
+name = "spacecrafts"
+version = "0.1.0-beta.2"
 dependencies = [
  "anyhow",
  "dirs",
