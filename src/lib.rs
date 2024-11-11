@@ -12,15 +12,62 @@ pub type APID = u16;
 pub type SCID = u16;
 pub type VCID = u16;
 
-#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct Link {
+    pub href: String,
+    #[serde(rename = "type")]
+    pub link_type: Option<String>,
+    pub description: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub enum TimecodeFormat {
+    /// Day segmented timecode parameters.
+    ///
+    /// Valid combinations are:
+    /// |`num_day`|`num_submillis`| |
+    /// |---|---|---|
+    /// |2|0|No sub-milliseconds|
+    /// |2|2|Microsecond resolution|
+    /// |2|4|Picosecond resolution|
+    /// |3|0|No sub-milliseconds|
+    /// |3|2|Microsecond resolution|
+    /// |3|4|Picosecond resolution|
+    Cds {
+        num_day: usize,
+        num_submillis: usize,
+    },
+    /// Unsegmented timecode parameters.
+    ///
+    /// Valid `num_coarse` is between 1 and 4.
+    /// Valid `num_fine` is between 0 and 3.
+    Cuc {
+        num_coarse: usize,
+        num_fine: usize,
+        /// Factor by which to multiple `num_fine` to produce nanoseconds.
+        fine_mult: Option<f32>,
+    },
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(rename = "timecodeFormat")]
+pub struct TimecodeInfo {
+    pub epoch: String,
+    pub offset: usize,
+    pub format: TimecodeFormat,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename = "APID")]
 pub struct APIDInfo {
     pub apid: APID,
     pub description: String,
     pub sensor: String,
+    pub timecode_format: Option<TimecodeInfo>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename = "VCID")]
 pub struct VCIDInfo {
     pub vcid: VCID,
@@ -28,7 +75,7 @@ pub struct VCIDInfo {
     pub apids: Vec<APIDInfo>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct RSConfig {
     pub interleave: u8,
@@ -36,10 +83,10 @@ pub struct RSConfig {
     pub num_correctable: u32,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct PnConfig {}
 
-#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct FramingConfig {
     /// Length of the frame, not including any rs parity bytes. See ``cadu_len``.
@@ -61,7 +108,7 @@ impl FramingConfig {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Spacecraft {
     pub scid: SCID,
@@ -70,17 +117,18 @@ pub struct Spacecraft {
     pub catalog_number: u32,
     pub framing_config: FramingConfig,
     pub vcids: Vec<VCIDInfo>,
+    pub links: Option<Vec<Link>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DB {
     #[serde(skip)]
-    path: String,
-    version: String,
-    git_sha: String,
-    generated: String,
-    spacecrafts: Vec<Spacecraft>,
+    pub path: String,
+    pub version: String,
+    pub git_sha: String,
+    pub generated: String,
+    pub spacecrafts: Vec<Spacecraft>,
 }
 
 impl DB {
