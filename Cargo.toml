@@ -6,7 +6,7 @@ edition = "2021"
 description = "Spacecraft metadata"
 keywords = ["spacepacket", "framing", "cadu"]
 categories = ["aerospace::space-protocols"]
-license-file = "LICENSE.txt"
+license = "MIT OR Apache-2.0""
 repository = "https://github.com/bmflynn/spacecrafts-rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
