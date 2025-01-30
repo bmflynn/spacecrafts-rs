@@ -1,0 +1,46 @@
+{
+  "spacecrafts": [
+    {
+      "scid": 157,
+      "name": "snpp",
+      "aliases": [
+        "npp"
+      ],
+      "catalogNumber": 37849,
+      "framingConfig": {
+        "length": 892,
+        "insertZoneLength": 0,
+        "trailerLength": 0,
+        "pseudoNoise": {},
+        "reedSolomon": {
+          "interleave": 4,
+          "virtualFillLength": 0,
+          "numCorrectable": 16
+        }
+      },
+      "vcids": [
+        {
+          "vcid": 0,
+          "description": "Satellite housekeeping",
+          "apids": [
+            {
+              "apid": 0,
+              "sensor": "spacecraft",
+              "description": "Bus critical",
+              "timecodeFormat": {
+                "epoch": "1958-01-01T00:00:00Z",
+                "format": "cds",
+                "offset": 0,
+                "numDay": 2,
+                "numSubmillis": 2
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "version": "0.2.0",
+  "gitSha": "e53ec841d203e1bff652c42ca283eed0478e4af7",
+  "generated": "2025-01-22T22:11:04+00:00"
+}
