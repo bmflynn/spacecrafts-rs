@@ -2,6 +2,7 @@
 pub enum Error {
     #[error(transparent)]
     IO(#[from] std::io::Error),
+    #[cfg(feature = "serde")]
     #[error("json syntax: {0}")]
     SerdeJSON(#[from] serde_json::Error),
     #[error("invalid: {0}")]

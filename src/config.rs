@@ -1,5 +1,9 @@
-use std::{collections::HashMap, fs::File, path::Path};
+use std::collections::HashMap;
 
+#[cfg(feature = "serde")]
+use std::{fs::File, path::Path};
+
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 use crate::{Apid, Error, Result, Vcid};
@@ -7,27 +11,31 @@ use crate::{Apid, Error, Result, Vcid};
 // Standard CCSDS ASM length
 const ASM_LEN: usize = 4;
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub enum FrameType {
     CcsdsAos,
     CcsdsTm,
     None,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct RS {
     pub interleave: usize,
     pub virtual_fill_length: Option<usize>,
     pub num_correctable: u32,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", Serialize, Deserialize)]
 pub struct PNConfig {}
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct FramingConfig {
     pub length: usize,
     pub fhec_present: Option<bool>,
@@ -35,13 +43,14 @@ pub struct FramingConfig {
     pub fec_present: Option<bool>,
     pub izone_length: Option<usize>,
     pub pseudo_noise: Option<PNConfig>,
-    #[serde(rename = "type")]
+    #[cfg_attr(feature = "serde", serde(rename = "type"))]
     pub frame_type: FrameType,
     pub reed_solomon: Option<RS>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct ChannelFramingConfig {
     pub fhec_present: Option<bool>,
     pub ocf_present: Option<bool>,
@@ -49,45 +58,51 @@ pub struct ChannelFramingConfig {
     pub izone_length: Option<usize>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct FrameChannel {
     pub vcid: Vcid,
     pub framing: Option<ChannelFramingConfig>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct PacketChannel {
     pub apid: Apid,
     pub vcid: Vcid,
     pub timecode: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase", tag = "format")]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", serde(rename_all = "lowercase", tag = "format"))]
 pub enum TimecodeConfig {
     CDS {
         epoch: String,
-        #[serde(rename = "dayLength")]
+        #[cfg_attr(feature = "serde", serde(rename = "dayLength"))]
         day_length: Option<usize>,
-        #[serde(rename = "submillisLength")]
+        #[cfg_attr(feature = "serde", serde(rename = "submillisLength"))]
         submillis_length: Option<usize>,
-        #[serde(rename = "selfIdentifying")]
+        #[cfg_attr(feature = "serde", serde(rename = "selfIdentifying"))]
         self_identifying: Option<bool>,
     },
     CUC {
         epoch: String,
-        #[serde(rename = "basicLength")]
+        #[cfg_attr(feature = "serde", serde(rename = "basicLength"))]
         basic_length: Option<usize>,
-        #[serde(rename = "fineLength")]
+        #[cfg_attr(feature = "serde", serde(rename = "fineLength"))]
         fine_length: Option<usize>,
-        #[serde(rename = "fineNanos")]
+        #[cfg_attr(feature = "serde", serde(rename = "fineNanos"))]
         fine_nanos: Option<u32>,
-        #[serde(rename = "selfIdentifying")]
+        #[cfg_attr(feature = "serde", serde(rename = "selfIdentifying"))]
         self_identifying: Option<bool>,
     },
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", Serialize, Deserialize)]
 pub struct Spacecraft {
     pub scid: u16,
     pub name: String,
@@ -100,6 +115,7 @@ pub struct Spacecraft {
 }
 
 impl Spacecraft {
+    #[cfg(feature = "serde")]
     pub fn with_file<P: AsRef<Path>>(path: P) -> Result<Spacecraft> {
         config_with_file(path)
     }
@@ -183,6 +199,7 @@ impl Spacecraft {
     }
 }
 
+#[cfg(feature = "serde")]
 fn config_with_file<P: AsRef<Path>>(path: P) -> Result<Spacecraft> {
     let reader = File::open(&path)?;
     let cfg: Spacecraft = serde_json::from_reader(reader)?;
