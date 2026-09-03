@@ -12,7 +12,7 @@ use crate::{Apid, Error, Result, Vcid};
 const ASM_LEN: usize = 4;
 
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub enum FrameType {
     CcsdsAos,
@@ -21,7 +21,7 @@ pub enum FrameType {
 }
 
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct RS {
     pub interleave: usize,
@@ -30,11 +30,11 @@ pub struct RS {
 }
 
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct PNConfig {}
 
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct FramingConfig {
     pub length: usize,
@@ -49,7 +49,7 @@ pub struct FramingConfig {
 }
 
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct ChannelFramingConfig {
     pub fhec_present: Option<bool>,
@@ -59,7 +59,7 @@ pub struct ChannelFramingConfig {
 }
 
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct FrameChannel {
     pub vcid: Vcid,
@@ -67,7 +67,7 @@ pub struct FrameChannel {
 }
 
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct PacketChannel {
     pub apid: Apid,
@@ -76,7 +76,7 @@ pub struct PacketChannel {
 }
 
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "lowercase", tag = "format"))]
 pub enum TimecodeConfig {
     CDS {
@@ -102,7 +102,7 @@ pub enum TimecodeConfig {
 }
 
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Spacecraft {
     pub scid: u16,
     pub name: String,

@@ -8,8 +8,6 @@ keywords = ["spacepacket", "framing", "cadu"]
 categories = ["aerospace::space-protocols"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/bmflynn/spacecrafts-rs"
-default-featuires = ["serde"]
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 serde = { version = "^1.0", features = ["derive"] , optional = true}
@@ -17,4 +15,5 @@ serde_json = {version = "^1.0", optional = true}
 thiserror = "^2.0"
 
 [features]
+default = ["serde"]
 serde = ["dep:serde", "dep:serde_json"]
