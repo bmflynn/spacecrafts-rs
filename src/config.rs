@@ -20,16 +20,23 @@ pub enum FrameType {
     None,
 }
 
+impl FrameType {
+    fn default() -> Self {
+        Self::CcsdsAos
+    }
+}
+
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct RS {
     pub interleave: usize,
-    pub virtual_fill_length: Option<usize>,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub virtual_fill_length: usize,
     pub num_correctable: u32,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct PNConfig {}
 
@@ -38,12 +45,20 @@ pub struct PNConfig {}
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct FramingConfig {
     pub length: usize,
-    pub fhec_present: Option<bool>,
-    pub ocf_present: Option<bool>,
-    pub fec_present: Option<bool>,
-    pub izone_length: Option<usize>,
+    pub asm: Option<Vec<u8>>,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub fhec_present: bool,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub ocf_present: bool,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub fec_present: bool,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub izone_length: usize,
     pub pseudo_noise: Option<PNConfig>,
-    #[cfg_attr(feature = "serde", serde(rename = "type"))]
+    #[cfg_attr(
+        feature = "serde",
+        serde(rename = "type", default = "FrameType::default")
+    )]
     pub frame_type: FrameType,
     pub reed_solomon: Option<RS>,
 }
@@ -52,10 +67,14 @@ pub struct FramingConfig {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct ChannelFramingConfig {
-    pub fhec_present: Option<bool>,
-    pub ocf_present: Option<bool>,
-    pub fec_present: Option<bool>,
-    pub izone_length: Option<usize>,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub fhec_present: bool,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub ocf_present: bool,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub fec_present: bool,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub izone_length: usize,
 }
 
 #[derive(Debug, Clone)]
@@ -72,6 +91,7 @@ pub struct FrameChannel {
 pub struct PacketChannel {
     pub apid: Apid,
     pub vcid: Vcid,
+    /// Name of global timecode configuration.
     pub timecode: Option<String>,
 }
 
@@ -81,23 +101,23 @@ pub struct PacketChannel {
 pub enum TimecodeConfig {
     CDS {
         epoch: String,
-        #[cfg_attr(feature = "serde", serde(rename = "dayLength"))]
-        day_length: Option<usize>,
-        #[cfg_attr(feature = "serde", serde(rename = "submillisLength"))]
-        submillis_length: Option<usize>,
-        #[cfg_attr(feature = "serde", serde(rename = "selfIdentifying"))]
-        self_identifying: Option<bool>,
+        #[cfg_attr(feature = "serde", serde(rename = "dayLength", default))]
+        day_length: usize,
+        #[cfg_attr(feature = "serde", serde(rename = "submillisLength", default))]
+        submillis_length: usize,
+        #[cfg_attr(feature = "serde", serde(rename = "selfIdentifying", default))]
+        self_identifying: bool,
     },
     CUC {
         epoch: String,
-        #[cfg_attr(feature = "serde", serde(rename = "basicLength"))]
-        basic_length: Option<usize>,
-        #[cfg_attr(feature = "serde", serde(rename = "fineLength"))]
-        fine_length: Option<usize>,
-        #[cfg_attr(feature = "serde", serde(rename = "fineNanos"))]
-        fine_nanos: Option<u32>,
-        #[cfg_attr(feature = "serde", serde(rename = "selfIdentifying"))]
-        self_identifying: Option<bool>,
+        #[cfg_attr(feature = "serde", serde(rename = "basicLength", default))]
+        basic_length: usize,
+        #[cfg_attr(feature = "serde", serde(rename = "fineLength", default))]
+        fine_length: usize,
+        #[cfg_attr(feature = "serde", serde(rename = "fineNanos", default))]
+        fine_nanos: u32,
+        #[cfg_attr(feature = "serde", serde(rename = "selfIdentifying", default))]
+        self_identifying: bool,
     },
 }
 
@@ -105,12 +125,18 @@ pub enum TimecodeConfig {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Spacecraft {
     pub scid: u16,
-    pub name: String,
+    /// The canonical identifier for the satellite.
     pub norad_catalog_id: u32,
-    pub aliaes: Option<Vec<String>>,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub name: String,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub aliaes: Vec<String>,
     pub framing: FramingConfig,
+    #[cfg_attr(feature = "serde", serde(default))]
     pub vcids: Vec<FrameChannel>,
+    #[cfg_attr(feature = "serde", serde(default))]
     pub apids: Vec<PacketChannel>,
+    #[cfg_attr(feature = "serde", serde(default))]
     pub timecodes: HashMap<String, TimecodeConfig>,
 }
 
@@ -128,8 +154,8 @@ impl Spacecraft {
                     self_identifying,
                     ..
                 } => {
-                    if !self_identifying.unwrap_or(false) {
-                        if day_length.is_none() {
+                    if !self_identifying {
+                        if *day_length == 0 {
                             return Err(Error::Invalid(format!(
                                 "timecode config {key} requires at least day length and epoch"
                             )));
@@ -141,8 +167,8 @@ impl Spacecraft {
                     self_identifying,
                     ..
                 } => {
-                    if !self_identifying.unwrap_or(false) {
-                        if basic_length.is_none() {
+                    if !self_identifying {
+                        if *basic_length == 0 {
                             return Err(Error::Invalid(format!(
                                 "timecode config {key} requires at least basic length and epoch"
                             )));
