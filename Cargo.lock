@@ -65,7 +65,7 @@ dependencies = [
 
 [[package]]
 name = "spacecrafts"
-version = "0.2.0-beta.0"
+version = "0.2.0-beta.1"
 dependencies = [
  "serde",
  "serde_json",
