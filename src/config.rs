@@ -13,10 +13,12 @@ const ASM_LEN: usize = 4;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub enum FrameType {
+    #[serde(rename = "ccsds_aos")]
     CcsdsAos,
+    #[serde(rename = "ccsds_tm")]
     CcsdsTm,
+    #[serde(rename = "none")]
     None,
 }
 
@@ -37,7 +39,11 @@ pub struct RS {
 }
 
 #[derive(Debug, Default, Clone)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(
+    feature = "serde",
+    derive(Serialize, Deserialize),
+    serde(rename_all = "camelCase")
+)]
 pub struct PNConfig {}
 
 #[derive(Debug, Clone)]
@@ -52,7 +58,7 @@ pub struct FramingConfig {
     pub ocf_present: bool,
     #[cfg_attr(feature = "serde", serde(default))]
     pub fec_present: bool,
-    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(feature = "serde", serde(rename = "insertZoneLength", default))]
     pub izone_length: usize,
     pub pseudo_noise: Option<PNConfig>,
     #[cfg_attr(
@@ -73,7 +79,7 @@ pub struct ChannelFramingConfig {
     pub ocf_present: bool,
     #[cfg_attr(feature = "serde", serde(default))]
     pub fec_present: bool,
-    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(feature = "serde", serde(rename = "insertZoneLength", default))]
     pub izone_length: usize,
 }
 
@@ -122,15 +128,20 @@ pub enum TimecodeConfig {
 }
 
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(
+    feature = "serde",
+    derive(Serialize, Deserialize),
+    serde(rename_all = "camelCase")
+)]
 pub struct Spacecraft {
     pub scid: u16,
     /// The canonical identifier for the satellite.
+    #[cfg_attr(feature = "serde", serde(rename = "noradCatalogID"))]
     pub norad_catalog_id: u32,
     #[cfg_attr(feature = "serde", serde(default))]
     pub name: String,
     #[cfg_attr(feature = "serde", serde(default))]
-    pub aliaes: Vec<String>,
+    pub aliases: Vec<String>,
     pub framing: FramingConfig,
     #[cfg_attr(feature = "serde", serde(default))]
     pub vcids: Vec<FrameChannel>,
