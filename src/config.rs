@@ -51,8 +51,6 @@ pub struct PNConfig {}
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct FramingConfig {
     pub length: usize,
-    #[cfg_attr(feature = "serde", serde(default))]
-    pub description: String,
     #[cfg_attr(feature = "serde", serde(default = "FramingConfig::default_asm"))]
     pub asm: Vec<u8>,
     #[cfg_attr(feature = "serde", serde(default))]
@@ -97,6 +95,8 @@ pub struct ChannelFramingConfig {
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct FrameChannel {
     pub vcid: Vcid,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub description: String,
     pub framing: Option<ChannelFramingConfig>,
 }
 
