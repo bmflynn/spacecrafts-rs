@@ -51,7 +51,10 @@ pub struct PNConfig {}
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct FramingConfig {
     pub length: usize,
-    pub asm: Option<Vec<u8>>,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub description: String,
+    #[cfg_attr(feature = "serde", serde(default = "FramingConfig::default_asm"))]
+    pub asm: Vec<u8>,
     #[cfg_attr(feature = "serde", serde(default))]
     pub fhec_present: bool,
     #[cfg_attr(feature = "serde", serde(default))]
@@ -67,6 +70,12 @@ pub struct FramingConfig {
     )]
     pub frame_type: FrameType,
     pub reed_solomon: Option<RS>,
+}
+
+impl FramingConfig {
+    fn default_asm() -> Vec<u8> {
+        vec![0x1a, 0xcf, 0xfc, 0x1d]
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -97,6 +106,10 @@ pub struct FrameChannel {
 pub struct PacketChannel {
     pub apid: Apid,
     pub vcid: Vcid,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub sensor: String,
+    #[cfg_attr(feature = "serde", serde(default))]
+    pub description: String,
     /// Name of global timecode configuration.
     pub timecode: Option<String>,
 }
